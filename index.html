@@ -1,253 +1,383 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jasa Tolong Pemalang</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jasa Tolong Pemalang</title>
 
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            background: #f8f6f3;
-        }
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff5722">
 
-        .hero {
-            background: linear-gradient(135deg, #ff784e, #ff5722);
-            padding: 70px 20px;
-            color: white;
-            text-align: center;
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
+<style>
+    /* --- Layout asli (tidak diubah visual utama) --- */
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        background: #f8f6f3;
+        transition: background 0.25s, color 0.25s;
+    }
 
-        .hero h1 {
-            margin: 0;
-            font-size: 32px;
-            font-weight: bold;
-        }
+    /* Dark mode */
+    body.dark { background: #222; color: #fff; }
+    body.dark .card { background:#333; color:#fff; }
+    body.dark input, body.dark textarea { background:#444; color:#fff; border-color:#666; }
+    body.dark #popupForm { background:#333; color:#fff; }
 
-        .hero p {
-            margin-top: 10px;
-            font-size: 16px;
-            opacity: 0.9;
-        }
+    /* Toggle */
+    .dark-toggle {
+        position: fixed; top: 15px; right: 15px; z-index: 1200;
+        background: #ff5722; color:#fff; padding:8px 12px; border-radius:18px;
+        cursor:pointer; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.25);
+    }
 
-        .hero-img {
-            width: 200px;
-            height: 290px;
-            margin: 20px auto 0;
-            border-radius: 16px;
-            background:
-                linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0)),
-                url('1.jpg');
-            background-size: cover;
-            background-position: center;
-            filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.2));
-        }
+    /* Original hero / services (keutuhan layout dipertahankan) */
+    .hero {
+        background: linear-gradient(135deg,#ff784e,#ff5722);
+        padding:70px 20px; color:#fff; text-align:center;
+        border-bottom-left-radius:40px; border-bottom-right-radius:40px;
+        box-shadow:0 8px 20px rgba(0,0,0,0.15);
+    }
+    .hero h1{margin:0;font-size:32px;font-weight:700;}
+    .hero p{margin-top:10px;font-size:16px;opacity:.9;}
+    .hero-img{width:200px;height:290px;margin:20px auto 0;border-radius:16px;
+        background:linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0)), url('1.jpg');
+        background-size:cover;background-position:center; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+        transform-origin:center;
+        animation: heroEntrance .9s ease;
+    }
 
-        .services {
-            margin-top: -40px;
-            padding: 0 20px 40px;
-        }
+    @keyframes heroEntrance {
+        from { opacity:0; transform: translateY(10px) scale(.98); }
+        to { opacity:1; transform: translateY(0) scale(1); }
+    }
 
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 18px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
+    .services{ margin-top:-40px; padding:0 20px 40px; }
+    .card{
+        background:white;padding:20px;border-radius:18px;
+        box-shadow:0 4px 14px rgba(0,0,0,0.08); margin-bottom:20px;
+        transform-origin:center;
+        animation: cardUp .6s ease both;
+    }
+    .card img{ width:60px; float:right; margin-top:-30px; opacity:.85; }
 
-        .card h3 {
-            margin: 0;
-            color: #ff5722;
-            font-size: 20px;
-        }
+    @keyframes cardUp {
+        from { opacity:0; transform: translateY(10px); }
+        to { opacity:1; transform: translateY(0); }
+    }
 
-        .card p {
-            margin-top: 8px;
-            font-size: 14px;
-            color: #444;
-        }
+    .order-btn {
+        display:block; width:100%; padding:14px; text-align:center;
+        background:#ff5722; color:white; font-size:18px; border-radius:12px;
+        margin-top:25px; text-decoration:none; box-shadow:0 6px 16px rgba(255,87,34,0.35);
+        transition: transform .15s ease;
+    }
+    .order-btn:hover { transform: scale(1.02); }
 
-        .card img {
-            width: 60px;
-            float: right;
-            margin-top: -30px;
-            opacity: 0.85;
-        }
+    /* Popup overlay & box (keaslian visual dipertahankan) */
+    #popupOverlay {
+        display:none; position:fixed; inset:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.6); z-index:1100; opacity:0; transition:opacity .28s ease;
+    }
 
-        .order-btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            text-align: center;
-            background: #ff5722;
-            color: white;
-            font-size: 18px;
-            border-radius: 12px;
-            margin-top: 25px;
-            text-decoration: none;
-            box-shadow: 0 6px 16px rgba(255,87,34,0.35);
-        }
+    #popupForm {
+        display:none; position:fixed; top:55%; left:50%;
+        transform:translate(-50%,-50%) scale(.9);
+        background:white; width:90%; max-width:420px; padding:20px;
+        border-radius:14px; box-shadow:0 4px 20px rgba(0,0,0,0.2);
+        z-index:1101; opacity:0; transition:transform .28s ease, opacity .28s ease;
+    }
 
-        #popupOverlay {
-            display: none;
-            position: fixed; top:0; left:0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 99;
-        }
+    /* show states */
+    #popupOverlay.show { display:block; opacity:1; }
+    #popupForm.show { display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
 
-        #popupForm {
-            display: none;
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            width: 90%; max-width: 420px;
-            padding: 20px;
-            border-radius: 14px;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
+    /* inputs */
+    input, textarea{
+        width:100%; padding:10px; border-radius:8px;
+        border:1px solid #ccc; margin-bottom:12px; font-size:15px;
+    }
 
-        #popupForm h2 {
-            margin: 0;
-            color: #ff5722;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+    label { display:block; font-size:13px; margin-bottom:6px; color:#444; }
 
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            margin-bottom: 12px;
-            font-size: 15px;
-        }
+    .submit-btn {
+        background:#ff5722; color:white; padding:12px; width:100%; border:none;
+        border-radius:10px; font-size:17px; cursor:pointer; position:relative;
+    }
 
-        .submit-btn {
-            background: #ff5722;
-            color: white;
-            padding: 12px;
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            font-size: 17px;
-            cursor: pointer;
-        }
+    /* loading spinner in button */
+    .submit-btn.loading { pointer-events:none; opacity:0.9; }
+    .submit-btn .spinner {
+        position:absolute; left:14px; top:50%; transform:translateY(-50%);
+        width:18px; height:18px; border-radius:50%;
+        border:2px solid rgba(255,255,255,0.6); border-top-color:rgba(255,255,255,1);
+        animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        .close-btn {
-            margin-top: 10px;
-            background: #bbb;
-            padding: 10px;
-            width: 100%;
-            border-radius: 10px;
-            border: none;
-        }
+    /* close X */
+    .close-x {
+        position:absolute; top:10px; right:12px; font-size:20px; cursor:pointer; color:#666;
+    }
+    body.dark .close-x { color:#ddd; }
 
-        .whatsapp-float {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 999;
-        }
+    /* WA float (always fixed) */
+    .whatsapp-float { position:fixed; bottom:20px; right:20px; z-index:1200; }
+    .whatsapp-float img{
+        width:65px; height:65px; border-radius:50%;
+        box-shadow:0 6px 20px rgba(0,0,0,0.25); cursor:pointer;
+        animation: waPulse 2s infinite;
+    }
+    @keyframes waPulse {
+        0%{ transform:scale(1); }
+        50%{ transform:scale(1.06); }
+        100%{ transform:scale(1); }
+    }
 
-        .whatsapp-float img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            cursor: pointer;
-        }
-    </style>
+    /* subtle appear animation for page elements */
+    .fade-in { animation: fadeInUp .55s ease both; }
+    @keyframes fadeInUp {
+        from { opacity:0; transform: translateY(8px); }
+        to { opacity:1; transform: translateY(0); }
+    }
+
+    /* small responsive fix */
+    @media (max-width:420px){
+        .hero { padding:56px 14px; }
+    }
+</style>
 </head>
 <body>
 
-<div class="hero">
+<!-- Dark mode toggle -->
+<div class="dark-toggle" id="darkToggle">🌙 Mode</div>
+
+<!-- HERO -->
+<div class="hero fade-in">
     <h1>Jasa Tolong Pemalang</h1>
     <p>Layanan cepat – Titip, Antar, Beli, dan Bantuan Tugas Harian.</p>
-    <div class="hero-img"></div>
+    <div class="hero-img" aria-hidden="true"></div>
 </div>
 
-<div class="services">
-
+<!-- SERVICES / DASHBOARD -->
+<div class="services fade-in">
     <div class="card">
         <h3>Titip & Belanja</h3>
         <p>Beli kebutuhan rumah, makanan, dan barang lain tanpa ribet.</p>
-        <img src="https://cdn-icons-png.flaticon.com/512/3081/3081186.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/3081/3081186.png" alt="">
     </div>
 
     <div class="card">
         <h3>Antar Barang</h3>
         <p>Kirim barang dalam kota dengan cepat dan aman.</p>
-        <img src="b.png">
+        <img src="b.png" alt="">
     </div>
 
     <div class="card">
         <h3>Bantuan Pekerjaan</h3>
         <p>Cari seseorang untuk bantu tugas rumah, dokumen, pembelian, dll.</p>
-        <img src="c.png">
+        <img src="c.png" alt="">
     </div>
 
-    <a href="#" class="order-btn" onclick="openPopup()">Pesan Jasa Sekarang</a>
+    <a href="#" class="order-btn" id="orderBtn">Pesan Jasa Sekarang</a>
 </div>
 
-<div id="popupOverlay"></div>
+<!-- POPUP -->
+<div id="popupOverlay" aria-hidden="true"></div>
 
-<div id="popupForm">
-    <h2>Form Jasa Tolong</h2>
+<div id="popupForm" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+    <div class="close-x" id="closeX" title="Tutup">✖</div>
 
-    <input id="nama" type="text" placeholder="Nama Anda" required>
-    <input id="budget" type="text" placeholder="Budget Anda" required>
-    <input id="alamat" type="text" placeholder="Alamat dan Kota" required>
-    <input id="tanggal" type="date" required>
-    <input id="jam" type="time" required>
-    <textarea id="detail" placeholder="Tulis detail pekerjaan yang Anda butuhkan disini." required></textarea>
+    <h2 id="formTitle">Form Jasa Tolong</h2>
 
-    <button onclick="sendWA()" class="submit-btn">Kirim Sekarang</button>
-    <button onclick="closePopup()" class="close-btn">Tutup</button>
+    <input id="nama" type="text" placeholder="Nama Anda" />
+    <input id="budget" type="text" placeholder="Budget Anda" />
+    <input id="alamat" type="text" placeholder="Alamat & Kota" />
+
+    <label for="tanggal">Tanggal</label>
+    <input id="tanggal" type="date" />
+
+    <label for="jam">Jam</label>
+    <input id="jam" type="time" />
+
+    <textarea id="detail" placeholder="Tulis detail pekerjaan yang Anda butuhkan disini."></textarea>
+
+    <button id="sendBtn" class="submit-btn">
+        <span class="spinner" style="display:none;"></span>
+        <span class="btnText">Kirim</span>
+    </button>
+</div>
+
+<!-- WA FLOAT -->
+<div class="whatsapp-float" title="Chat via WhatsApp" id="waFloat">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
 </div>
 
 <script>
-function openPopup() {
-    document.getElementById("popupOverlay").style.display = "block";
-    document.getElementById("popupForm").style.display = "block";
+/* ---------------------------
+   Helper & element refs
+   --------------------------- */
+const popupOverlay = document.getElementById('popupOverlay');
+const popupForm = document.getElementById('popupForm');
+const orderBtn = document.getElementById('orderBtn');
+const closeX = document.getElementById('closeX');
+const darkToggle = document.getElementById('darkToggle');
+const waFloat = document.getElementById('waFloat');
+
+const sendBtn = document.getElementById('sendBtn');
+const spinner = sendBtn.querySelector('.spinner');
+const btnText = sendBtn.querySelector('.btnText');
+
+/* Input refs */
+const inp = id => document.getElementById(id);
+
+/* ---------------------------
+   Popup open/close with animation
+   --------------------------- */
+function openPopup(){
+    popupOverlay.classList.add('show');
+    popupForm.classList.add('show');
+    popupOverlay.style.display = 'block';
+    popupForm.style.display = 'block';
+    setTimeout(()=> {
+        popupOverlay.style.opacity = '1';
+        popupForm.style.opacity = '1';
+        popupForm.style.transform = 'translate(-50%,-50%) scale(1)';
+        inp('nama').focus();
+    }, 10);
 }
 
-function closePopup() {
-    document.getElementById("popupOverlay").style.display = "none";
-    document.getElementById("popupForm").style.display = "none";
+function closePopup(){
+    popupOverlay.style.opacity = '0';
+    popupForm.style.opacity = '0';
+    popupForm.style.transform = 'translate(-50%,-50%) scale(.9)';
+    setTimeout(()=> {
+        popupOverlay.style.display = 'none';
+        popupForm.style.display = 'none';
+        popupOverlay.classList.remove('show');
+        popupForm.classList.remove('show');
+    }, 280);
 }
 
-function sendWA() {
-    let nama = document.getElementById("nama").value;
-    let budget = document.getElementById("budget").value;
-    let alamat = document.getElementById("alamat").value;
-    let tanggal = document.getElementById("tanggal").value;
-    let jam = document.getElementById("jam").value;
-    let detail = document.getElementById("detail").value;
+/* keep dashboard visible - only show popup after click */
+orderBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    openPopup();
+});
+closeX.addEventListener('click', closePopup);
+popupOverlay.addEventListener('click', closePopup);
 
-    let msg =
-`Hallo, saya ingin pesan jasa:
+/* ESC to close */
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closePopup(); });
+
+/* dark toggle */
+darkToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+});
+
+/* ---------------------------
+   WA float auto-text
+   --------------------------- */
+waFloat.addEventListener('click', () => {
+    const auto = "Hallo, Jasa Tolong PML. Saya butuh bantuan...";
+    window.open("https://wa.me/628972577773?text=" + encodeURIComponent(auto), "_blank");
+});
+
+/* ---------------------------
+   Util: format date dd-mm-yyyy
+   --------------------------- */
+function formatTanggal(tgl){
+    if(!tgl) return '';
+    const d = new Date(tgl);
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+}
+
+/* ---------------------------
+   Send WA: validation, realtime geolocation, loading
+   --------------------------- */
+function showLoading(on=true){
+    if(on){
+        spinner.style.display = 'inline-block';
+        btnText.textContent = 'Mengirim...';
+        sendBtn.classList.add('loading');
+    } else {
+        spinner.style.display = 'none';
+        btnText.textContent = 'Kirim Sekarang';
+        sendBtn.classList.remove('loading');
+    }
+}
+
+sendBtn.addEventListener('click', function(){
+    // read safely using getElementById
+    const nama   = inp('nama').value.trim();
+    const budget = inp('budget').value.trim();
+    const alamat = inp('alamat').value.trim();
+    const tanggal= inp('tanggal').value;
+    const jam    = inp('jam').value;
+    const detail = inp('detail').value.trim();
+
+    // validation
+    if(!nama || !budget || !alamat || !tanggal || !jam || !detail){
+        alert('Mohon isi semua data.');
+        return;
+    }
+
+    showLoading(true);
+
+    // get geolocation realtime
+    if(!navigator.geolocation){
+        showLoading(false);
+        alert('Browser tidak mendukung geolokasi.');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const maps = `https://www.google.com/maps?q=${lat},${lon}`;
+
+        const pesan = `Hallo, Jasa Tolong PML.
 Nama: ${nama}
 Budget: ${budget}
 Alamat: ${alamat}
-Tanggal: ${tanggal}
+Tanggal: ${formatTanggal(tanggal)}
 Jam: ${jam}
-Detail: ${detail}`;
+Detail: ${detail}
+Lokasi: ${maps}`;
 
-    window.open("https://wa.me/628972577773?text=" + encodeURIComponent(msg), "_blank");
+        // open WA in new tab
+        window.open("https://wa.me/628972577773?text=" + encodeURIComponent(pesan), "_blank");
+
+        // stop loading + close popup
+        setTimeout(()=> { showLoading(false); closePopup(); }, 600);
+
+    }, err => {
+        showLoading(false);
+        if(err.code === 1){
+            alert('Izin lokasi ditolak. Izinkan GPS lalu coba lagi.');
+        } else {
+            alert('Gagal mengambil lokasi. Coba lagi.');
+        }
+    }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
+
+});
+
+/* ---------------------------
+   PWA: register service worker
+   --------------------------- */
+if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+        navigator.serviceWorker.register('service-worker.js')
+        .then(reg => {
+            // console.log('SW registered', reg);
+        }).catch(err => {
+            // console.warn('SW failed', err);
+        });
+    });
 }
 </script>
-
-<a href="https://wa.me/628972577773" class="whatsapp-float">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
-</a>
-
 </body>
 </html>
