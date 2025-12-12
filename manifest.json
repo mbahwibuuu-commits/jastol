@@ -1,0 +1,23 @@
+{
+  "name": "Jasa Tolong Pemalang",
+  "short_name": "Jastol",
+  "description": "Layanan titip, antar barang, belanja dan bantuan pekerjaan harian untuk wilayah Pemalang.",
+  "start_url": "/jastol/",
+  "scope": "/jastol/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff5722",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
